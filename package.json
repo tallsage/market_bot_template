@@ -10,7 +10,7 @@
   "dependencies": {
     "axios": "^0.21.0",
     "dotenv": "^8.2.0",
-    "fs": "0.0.1-security",
+    "fs": "^0.0.1-security",
     "mongodb": "^3.6.3",
     "telegraf": "^3.38.0"
   },

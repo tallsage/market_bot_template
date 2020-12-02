@@ -39,20 +39,7 @@ class AddSceneGenerator {
                 if (ctx.message.text != undefined) {
                     BDarr[nameArr[counter]] = ctx.message.text
                 } else {
-                    let file = ctx.message.photo.length - 1
-                    let fileId = ctx.message.photo[file].file_id;
-                    console.log( ctx.telegram.getFileLink(fileId));
-                    ctx.telegram.getFileLink(fileId).then(url => {
-                        axios({
-                            url,
-                            responseType: 'stream'
-                        }).then(response => {
-                            return new Promise((resolve, reject) => {
-                                response.data.pipe(fs.createWriteStream(`C:\\Users\\tallsage\\Documents\\code_parade\\market_bot_template\\photo\\${BDarr.id}.png`))
-
-                            });
-                        })
-                    })
+                    BDarr[nameArr[counter]] = ctx.message.photo[0].file_id
                 }
 
                 counter++
@@ -60,23 +47,24 @@ class AddSceneGenerator {
                 if (nameArr[counter] != undefined) {
                     ctx.scene.reenter()
                 } else {
+
                     counter = 0
-                    addProdBD(BDarr.id, BDarr.nameProd, BDarr.description, BDarr.imgUrl, BDarr.price)
 
-                    bot.telegram.sendPhoto(
-                        ctx.chat.id, {
-                            source: fs.readFileSync(`C:\\Users\\tallsage\\Documents\\code_parade\\market_bot_template\\photo\\${BDarr.id}.png`),
-                        }, {
-                            caption: `${BDarr.nameProd}\n\n${BDarr.description}\n\n${BDarr.price}`
-                        }
-                    );
+                    addProdBD(BDarr.id, BDarr.nameProd, BDarr.description, BDarr.photo, BDarr.price)
 
+
+                    bot.telegram.sendPhoto(ctx.chat.id,
+                        BDarr.photo, {
+                            caption: `*${BDarr.nameProd}*\n\n${BDarr.description}\n\n*${BDarr.price}*`,
+                            parse_mode: 'Markdown'
+                        });
                     await bot.telegram.sendMessage(ctx.chat.id, 'Поздравляю, ты добавил товар и теперь ты в главном меню')
+
+
                     ctx.scene.leave()
                 }
             })
         })
-
         return addProdS
     }
 }
@@ -85,7 +73,7 @@ class AddSceneGenerator {
 async function addProdBD(id, nameProd, description, imgUrl, price) {
     try {
         await client.connect();
-        console.log('саси');
+        console.log('успешно подключился к бд');
 
         const db = client.db('dataB333', {
             returnNonCachedInstance: true

@@ -1,7 +1,6 @@
 {
   "name": "tomato-bot",
   "version": "1.0.0",
-  "description": "",
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,8 +8,19 @@
   "author": "tallsage <tallsagegame@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.0",
     "dotenv": "^8.2.0",
+    "fs": "0.0.1-security",
     "mongodb": "^3.6.3",
     "telegraf": "^3.38.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tallsage/market_bot_template.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tallsage/market_bot_template/issues"
+  },
+  "homepage": "https://github.com/tallsage/market_bot_template#readme",
+  "description": ""
 }

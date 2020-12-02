@@ -1,8 +1,9 @@
 const Scene = require('telegraf/scenes/base')
 const Telegraf = require('telegraf')
 const bot = new Telegraf(process.env.bot_token)
-const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config()
+
+const MongoClient = require('mongodb').MongoClient;
 const {
     Stage,
     session
@@ -12,16 +13,23 @@ const client = new MongoClient(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
+
 const AddSceneGenerator = require('./addProdScene')
-const curScene = new AddSceneGenerator()
-const addProdS = curScene.AddProductScene()
+const cur1Scene = new AddSceneGenerator()
+const addProdS = cur1Scene.AddProductScene()
 
 const EditSceneGenerator = require('./editProdScene');
 const { createContext } = require('vm');
-const curentEditScene = new EditSceneGenerator()
-const editProdS = curentEditScene.EditProductScene()
+const cur2EditScene = new EditSceneGenerator()
+const editProdS = cur2EditScene.EditProductScene()
 
-const stage = new Stage([addProdS, editProdS])
+const AllSceneGenerator = require('./allProducts')
+const cur3Scene = new AllSceneGenerator()
+const allProdS = cur3Scene.AllProductScene()
+
+const stage = new Stage([
+    addProdS, editProdS, allProdS
+])
 
 
 bot.use(session())

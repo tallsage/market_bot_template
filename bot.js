@@ -17,19 +17,21 @@ const bot = new Telegraf(process.env.bot_token)
 
 
 const AddSceneGenerator = require('./scenes/addProdScene')
-const curentScene = new AddSceneGenerator()
-const addProdS = curentScene.AddProductScene()
+const cur1Scene = new AddSceneGenerator()
+const addProdS = cur1Scene.AddProductScene()
 
 const EditSceneGenerator = require('./scenes/editProdScene')
-const curentEditScene = new EditSceneGenerator()
-const editProdS = curentEditScene.EditProductScene()
+const cur2EditScene = new EditSceneGenerator()
+const editProdS = cur2EditScene.EditProductScene()
 
 const SceneGenerator = require('./scenes/adminScene')
-const curScene = new SceneGenerator()
-const adminS = curScene.AdminScene()
-const userS = curScene.UserScene()
+const cur3Scene = new SceneGenerator()
+const adminS = cur3Scene.AdminScene()
+const userS = cur3Scene.UserScene()
 
-const stage = new Stage([adminS, userS, addProdS, editProdS])
+const stage = new Stage([
+    adminS, userS, addProdS, editProdS
+])
 
 
 bot.use(session())

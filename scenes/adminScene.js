@@ -47,21 +47,22 @@ class SceneGenerator {
         const adminS = new Scene('adminS')
 
         adminS.enter((ctx) => {
-            bot.telegram.sendMessage(ctx.chat.id, 'Теперь ты в главном меню', 
-            Keyboard(3, 'добавить продукт', 'редактировать продукт', 'посмотреть все товары')
+            bot.telegram.sendMessage(ctx.chat.id, 'Теперь ты в главном меню',
+                Keyboard(3, 'добавить продукт', 'редактировать продукт', 'посмотреть все товары')
             )
-            adminS.hears('добавить продукт', async (ctx) => {
-                 ctx.scene.enter('addProdS')
-                ctx.scene.reenter()
-           })
-           adminS.hears('редактировать продукт', (ctx) => {
-               ctx.scene.enter('editProdS')
-               ctx.scene.reenter()
-           })
-           adminS.hears('посмотреть все товары', (ctx) => {
-               ctx.scene.enter('allProdS')
-               ctx.scene.reenter()
-           })            
+
+        })
+        adminS.hears('добавить продукт', async (ctx) => {
+            ctx.scene.enter('addProdS')
+
+        })
+        adminS.hears('редактировать продукт', (ctx) => {
+            ctx.scene.enter('editProdS')
+
+        })
+        adminS.hears('посмотреть все товары', (ctx) => {
+            ctx.scene.enter('allProdS')
+
         })
         return adminS
     }
@@ -72,25 +73,25 @@ class SceneGenerator {
             bot.telegram.sendMessage(ctx.chat.id, 'привет привет привет привет привет привет привет приветприветпривет привет привет привет ', Keyboard(1, 'корзина'))
             var allPr = []
 
-            async function addProdBD() {
+            async function allProdBD() {
                 try {
                     await client.connect();
                     console.log('успешно подключился к бд');
-            
+
                     const db = client.db('dataB333', {
                         returnNonCachedInstance: true
                     });
-            
+
                     var col = db.collection("products");
-        
-                    var pos  = 0
+
+                    var pos = 0
                     var position = 0
-                    while (pos != null){
-                        position ++
+                    while (pos != null) {
+                        position++
                         pos = await col.findOne({
                             position: position
                         })
-            
+
                         allPr.push(pos)
                     }
                 } catch (err) {
@@ -98,35 +99,57 @@ class SceneGenerator {
                 }
             }
 
-            await addProdBD()
-            
-            var el = 0 
+            await allProdBD()
 
-            while (el < allPr.length -1){
+            var el = 0
+
+            while (el < allPr.length - 1) {
                 bot.telegram.sendPhoto(ctx.chat.id,
-                    allPr[el].img,  {
+                    allPr[el].img, {
                         caption: `*${allPr[el].name}*\n\n${allPr[el].description}\n\n*${allPr[el].price}*`,
                         parse_mode: 'Markdown',
                         reply_markup: {
                             inline_keyboard: [
                                 [{
-                                    text: ' добавить в корзину', 
+                                    text: ' добавить в корзину',
                                     callback_data: allPr[el]._id
                                 }]
-                            ]                            
+                            ]
                         }
-                    //     reply_markup:{
-                    //         keyboard: [
-                    //             ['перейти в корзину']
-                    //         ],
-                    //         resize_keyboard: true,
-                    //         one_time_keyboard: true
-                    // }
                     });
-                    el++
+                el++
             }
 
-            userS.hears('корзина', (ctx) =>{
+            userS.hears('корзина', (ctx) => {
+                async function addToProdBD() {
+                    try {
+                        await client.connect();
+                        console.log('успешно подключился к бд');
+
+                        const db = client.db('dataB333', {
+                            returnNonCachedInstance: true
+                        });
+
+                        var col = db.collection("users");
+
+                        var user = col.findOne({
+                            id: ctx.chat.id
+                        })
+
+                        if (user) {
+                            user = {
+                                "_id": ctx.chat.id,
+                                "basket": [{
+                                    
+                                }]
+                            }
+                        }
+                    } catch (err) {
+                        console.log(err);
+                    }
+                }
+
+                await addToProdBD()
                 ctx.scene.enter('basketS')
             })
         })
@@ -147,8 +170,7 @@ function Keyboard(butQuan, text1, text2, text3, text4) {
             return {
                 reply_markup: {
                         keyboard: [
-                            [createButton(text1)
-                            ],
+                            [createButton(text1)],
                         ],
                         resize_keyboard: true,
                         one_time_keyboard: true

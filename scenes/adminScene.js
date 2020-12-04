@@ -19,17 +19,19 @@ const cur1Scene = new AddSceneGenerator()
 const addProdS = cur1Scene.AddProductScene()
 
 const EditSceneGenerator = require('./editProdScene');
-const { createContext } = require('vm');
 const cur2EditScene = new EditSceneGenerator()
 const editProdS = cur2EditScene.EditProductScene()
 
 const AllSceneGenerator = require('./allProducts');
-const { keyboard } = require('telegraf/markup');
 const cur3Scene = new AllSceneGenerator()
 const allProdS = cur3Scene.AllProductScene()
 
+const BasketSceneGenerator = require('./basketScene');
+const cur4Scene = new BasketSceneGenerator()
+const basketS = cur4Scene.BasketScene()
+
 const stage = new Stage([
-    addProdS, editProdS, allProdS
+    addProdS, editProdS, allProdS, basketS
 ])
 
 
@@ -45,29 +47,25 @@ class SceneGenerator {
         const adminS = new Scene('adminS')
 
         adminS.enter((ctx) => {
-            bot.telegram.sendMessage(ctx.chat.id, 'a', 
-            Keyboard(4, 'добавить продукт', 'редактировать продукт', 'посмотреть все товары', 'зайти как покупатель')
+            bot.telegram.sendMessage(ctx.chat.id, 'Теперь ты в главном меню', 
+            Keyboard(3, 'добавить продукт', 'редактировать продукт', 'посмотреть все товары')
             )
             adminS.hears('добавить продукт', async (ctx) => {
-                ctx.scene.enter('addProdS')
+                 ctx.scene.enter('addProdS')
+                ctx.scene.reenter()
            })
            adminS.hears('редактировать продукт', (ctx) => {
-               console.log('asd');
                ctx.scene.enter('editProdS')
+               ctx.scene.reenter()
            })
            adminS.hears('посмотреть все товары', (ctx) => {
                ctx.scene.enter('allProdS')
-
-           })
-           adminS.hears('зайти как покупатель', (ctx) => {
-               ctx.scene.enter('enterAsUserS')
-           })
-            
+               ctx.scene.reenter()
+           })            
         })
-       
-
         return adminS
     }
+
     UserScene() {
         const userS = new Scene('userS')
         userS.enter(async (ctx) => {
@@ -127,10 +125,13 @@ class SceneGenerator {
                     });
                     el++
             }
+
+            userS.hears('корзина', (ctx) =>{
+                ctx.scene.enter('basketS')
+            })
         })
         return userS
     }
-
 }
 
 function createButton(text) {

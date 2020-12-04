@@ -1,17 +1,16 @@
 const Scene = require('telegraf/scenes/base')
 const Telegraf = require('telegraf');
 const telegram = require('telegraf');
-const axios = require('axios')
-const fs = require('fs');
+const bot = new Telegraf(process.env.bot_token)
+require('dotenv').config()
+
 const {
     countReset
 } = require('console');
 const {
     resize
 } = require('telegraf/markup');
-const bot = new Telegraf(process.env.bot_token)
 
-require('dotenv').config()
 
 // const mongodb = require('mongodb')
 const MongoClient = require('mongodb').MongoClient;
@@ -63,10 +62,8 @@ class EditSceneGenerator {
                             caption: `*${BDarr.nameProd}*\n\n${BDarr.description}\n\n*${BDarr.price}*`,
                             parse_mode: 'Markdown'
                         });
-                    await bot.telegram.sendMessage(ctx.chat.id, 'Поздравляю, ты добавил товар и теперь ты в главном меню')
 
-
-                    ctx.scene.leave()
+                    editProdS.leave()
                 }
             })
         })

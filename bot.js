@@ -33,8 +33,12 @@ const AllSceneGenerator = require('./scenes/allProducts')
 const cur4Scene = new AllSceneGenerator()
 const allProdS = cur4Scene.AllProductScene()
 
+const BasketSceneGenerator = require('./scenes/basketScene');
+const cur5Scene = new BasketSceneGenerator()
+const basketS = cur5Scene.BasketScene()
+
 const stage = new Stage([
-    adminS, userS, addProdS, editProdS, allProdS
+    adminS, userS, addProdS, editProdS, allProdS, basketS
 ])
 
 

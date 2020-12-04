@@ -60,10 +60,8 @@ class AddSceneGenerator {
                             caption: `*${BDarr.nameProd}*\n\n${BDarr.description}\n\n*${BDarr.price}*`,
                             parse_mode: 'Markdown'
                         });
-                    await bot.telegram.sendMessage(ctx.chat.id, 'Поздравляю, ты добавил товар и теперь ты в главном меню')
-
-
-                    ctx.scene.leave()
+                    
+                    addProdS.leave()
                 }
             })
         })

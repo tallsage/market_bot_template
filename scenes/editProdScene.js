@@ -94,6 +94,15 @@ async function editProdBD(id, nameProd, description, imgUrl, price) {
 
         var col = db.collection("products");
 
+        var pos  = 0
+        var position = 0
+        while (pos != null){
+            position ++
+            pos = await col.findOne({
+                position: position
+            })
+        }
+
         var myDoc = await col.findOne({
             _id: id
         });
@@ -120,7 +129,8 @@ async function editProdBD(id, nameProd, description, imgUrl, price) {
                 "name": nameProd,
                 "description": description,
                 "img": imgUrl,
-                "price": price
+                "price": price,
+                "position": position
             }
             await col.insertOne(productInfo);
         }

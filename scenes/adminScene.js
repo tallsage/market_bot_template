@@ -23,7 +23,8 @@ const { createContext } = require('vm');
 const cur2EditScene = new EditSceneGenerator()
 const editProdS = cur2EditScene.EditProductScene()
 
-const AllSceneGenerator = require('./allProducts')
+const AllSceneGenerator = require('./allProducts');
+const { keyboard } = require('telegraf/markup');
 const cur3Scene = new AllSceneGenerator()
 const allProdS = cur3Scene.AllProductScene()
 
@@ -44,7 +45,9 @@ class SceneGenerator {
         const adminS = new Scene('adminS')
 
         adminS.enter((ctx) => {
-            bot.telegram.sendMessage(ctx.chat.id, 'a', inlineKeyboard(4, 'добавить продукт', 'редактировать продукт', 'посмотреть все товары', 'зайти как покупатель'))
+            bot.telegram.sendMessage(ctx.chat.id, 'a', 
+            Keyboard(4, 'добавить продукт', 'редактировать продукт', 'посмотреть все товары', 'зайти как покупатель')
+            )
             adminS.hears('добавить продукт', async (ctx) => {
                 ctx.scene.enter('addProdS')
            })
@@ -53,7 +56,7 @@ class SceneGenerator {
                ctx.scene.enter('editProdS')
            })
            adminS.hears('посмотреть все товары', (ctx) => {
-               ctx.scene.enter('showProdS')
+               ctx.scene.enter('allProdS')
 
            })
            adminS.hears('зайти как покупатель', (ctx) => {
@@ -68,30 +71,66 @@ class SceneGenerator {
     UserScene() {
         const userS = new Scene('userS')
         userS.enter(async (ctx) => {
-            console.log('user');
+            bot.telegram.sendMessage(ctx.chat.id, 'привет привет привет привет привет привет привет приветприветпривет привет привет привет ', Keyboard(1, 'корзина'))
+            var allPr = []
+
+            async function addProdBD() {
+                try {
+                    await client.connect();
+                    console.log('успешно подключился к бд');
+            
+                    const db = client.db('dataB333', {
+                        returnNonCachedInstance: true
+                    });
+            
+                    var col = db.collection("products");
+        
+                    var pos  = 0
+                    var position = 0
+                    while (pos != null){
+                        position ++
+                        pos = await col.findOne({
+                            position: position
+                        })
+            
+                        allPr.push(pos)
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+
+            await addProdBD()
+            
+            var el = 0 
+
+            while (el < allPr.length -1){
+                bot.telegram.sendPhoto(ctx.chat.id,
+                    allPr[el].img,  {
+                        caption: `*${allPr[el].name}*\n\n${allPr[el].description}\n\n*${allPr[el].price}*`,
+                        parse_mode: 'Markdown',
+                        reply_markup: {
+                            inline_keyboard: [
+                                [{
+                                    text: ' добавить в корзину', 
+                                    callback_data: allPr[el]._id
+                                }]
+                            ]                            
+                        }
+                    //     reply_markup:{
+                    //         keyboard: [
+                    //             ['перейти в корзину']
+                    //         ],
+                    //         resize_keyboard: true,
+                    //         one_time_keyboard: true
+                    // }
+                    });
+                    el++
+            }
         })
         return userS
     }
 
-}
-async function addProdBD(id, nameProd, description, imgUrl, price) {
-    try {
-        await client.connect();
-        const db = client.db('dataB333', {
-            returnNonCachedInstance: true
-        });
-        var col = db.collection("products");
-        let productInfo = {
-            "_id": id,
-            "name": nameProd,
-            "description": description,
-            "img": imgUrl,
-            "price": price
-        }
-        await col.insertOne(productInfo);
-    } catch (err) {
-        console.log(err);
-    }
 }
 
 function createButton(text) {
@@ -101,8 +140,23 @@ function createButton(text) {
     })
 }
 
-function inlineKeyboard(butQuan, text1, text2, text3, text4) {
+function Keyboard(butQuan, text1, text2, text3, text4) {
     switch (butQuan) {
+        case 1:
+            return {
+                reply_markup: {
+                        keyboard: [
+                            [createButton(text1)
+                            ],
+                        ],
+                        resize_keyboard: true,
+                        one_time_keyboard: true
+
+                    },
+
+
+            }
+            break
         case 2:
             return {
                 reply_markup: {
@@ -153,4 +207,74 @@ function inlineKeyboard(butQuan, text1, text2, text3, text4) {
 
     }
 } //butQuan - это кол-во кнопок в клаве, text1 - текст первой кнопки и т.д.
+
+
+// function createInlineButton(text) {
+
+//     return ({
+//         text: text,
+//         callback_data: 123
+//     })
+// }
+
+// function inlineKeyboard(butQuan, text1, text2, text3, text4) {
+//     switch (butQuan) {
+//         case 1:
+//             return {
+//                 reply_markup: {
+//                     inline_keyboard: [
+//                             [createInlineButton(text1)                               
+//                             ],
+//                         ],
+
+//                     },
+
+
+//             }
+//             break
+//         case 2:
+//             return {
+//                 reply_markup: {
+//                     inline_keyboard: [
+//                             [createInlineButton(text1),
+//                                 createInlineButton(text2)
+//                             ],
+//                         ],
+
+//                     },
+
+
+//             }
+//             break
+//         case 3:
+//             return {
+//                 reply_markup: {
+//                     inline_keyboard: [
+//                         [createInlineButton(text1),
+//                             createInlineButton(text2)
+//                         ],
+//                         [createInlineButton(text3)]
+//                     ],
+//                 }
+
+//             }
+//             break
+//         case 4:
+//             return {
+//                 reply_markup: {
+//                     inline_keyboard: [
+//                         [createInlineButton(text1),
+//                             createInlineButton(text2)
+//                         ],
+//                         [createInlineButton(text3),
+//                             createInlineButton(text4)
+//                         ]
+//                     ],
+//                 }
+//             }
+//             break
+
+//     }
+// } //butQuan - это кол-во кнопок в клаве, text1 - текст первой кнопки и т.д.
+
 module.exports = SceneGenerator

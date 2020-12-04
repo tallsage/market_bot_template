@@ -40,6 +40,7 @@ class AddSceneGenerator {
                     BDarr[nameArr[counter]] = ctx.message.text
                 } else {
                     BDarr[nameArr[counter]] = ctx.message.photo[0].file_id
+                    // console.log(ctx.message.photo);
                 }
 
                 counter++
@@ -51,9 +52,10 @@ class AddSceneGenerator {
                     counter = 0
 
                     addProdBD(BDarr.id, BDarr.nameProd, BDarr.description, BDarr.photo, BDarr.price)
-
-
+                    
+                    // bot.telegram.photoSize(BDarr.photo, {width: 100, height: 100})
                     bot.telegram.sendPhoto(ctx.chat.id,
+                        
                         BDarr.photo, {
                             caption: `*${BDarr.nameProd}*\n\n${BDarr.description}\n\n*${BDarr.price}*`,
                             parse_mode: 'Markdown'
@@ -89,6 +91,16 @@ async function addProdBD(id, nameProd, description, imgUrl, price) {
 
         var col = db.collection("products");
 
+        var pos  = 0
+        var position = 0
+        while (pos != null){
+            position ++
+            pos = await col.findOne({
+                position: position
+            })
+        }
+
+
         var myDoc = await col.findOne({
             _id: id
         });
@@ -115,7 +127,8 @@ async function addProdBD(id, nameProd, description, imgUrl, price) {
                 "name": nameProd,
                 "description": description,
                 "img": imgUrl,
-                "price": price
+                "price": price,
+                "position": position
             }
             await col.insertOne(productInfo);
         }

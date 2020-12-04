@@ -29,8 +29,12 @@ const cur3Scene = new SceneGenerator()
 const adminS = cur3Scene.AdminScene()
 const userS = cur3Scene.UserScene()
 
+const AllSceneGenerator = require('./scenes/allProducts')
+const cur4Scene = new AllSceneGenerator()
+const allProdS = cur4Scene.AllProductScene()
+
 const stage = new Stage([
-    adminS, userS, addProdS, editProdS
+    adminS, userS, addProdS, editProdS, allProdS
 ])
 
 
@@ -48,5 +52,6 @@ bot.start(async (ctx, next)=>{
 
 
 bot.launch()
-
-var adminsArr = [474319147, 745243166]
+//474319147
+// 745243166
+var adminsArr = [0]

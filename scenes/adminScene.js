@@ -69,9 +69,18 @@ class SceneGenerator {
 
     UserScene() {
         const userS = new Scene('userS')
+
+
+
+
         userS.enter(async (ctx) => {
+
             bot.telegram.sendMessage(ctx.chat.id, 'привет привет привет привет привет привет привет приветприветпривет привет привет привет ', Keyboard(1, 'корзина'))
+
+
+            var el = 0
             var allPr = []
+            var idArr = []
 
             async function allProdBD() {
                 try {
@@ -101,7 +110,6 @@ class SceneGenerator {
 
             await allProdBD()
 
-            var el = 0
 
             while (el < allPr.length - 1) {
                 bot.telegram.sendPhoto(ctx.chat.id,
@@ -117,11 +125,13 @@ class SceneGenerator {
                             ]
                         }
                     });
+
+                idArr.push(allPr[el]._id)
                 el++
             }
 
-            userS.hears('корзина', (ctx) => {
-                async function addToProdBD() {
+            userS.action(idArr, async (ctx) => {
+                async function addProdToBasket() {
                     try {
                         await client.connect();
                         console.log('успешно подключился к бд');
@@ -132,27 +142,98 @@ class SceneGenerator {
 
                         var col = db.collection("users");
 
-                        var user = col.findOne({
-                            id: ctx.chat.id
+                        var user = await col.findOne({
+                            _id: ctx.chat.id
                         })
 
+
                         if (user) {
-                            user = {
+                            var i = 0
+                            var j = 0
+
+                            while (j != user.basket.length) {
+                                var flag = false
+                                
+                                if (user.basket[i].product_id === ctx.match) {
+                                    flag = true
+                                    break
+                                }
+                                j++
+                            }
+                            
+                            if (flag == true) {
+                                while (i != user.basket.length) {
+                                    var lastBasket = user.basket
+                                    var basketCounter = user.basket[i].quantitie + 1
+                                    if (user.basket[i].product_id === ctx.match) {
+                                        lastBasket.splice(i, 1)
+                                        var newBasket = {
+                                            "product_id": ctx.match,
+                                            "quantitie": basketCounter
+                                        }
+                                        lastBasket.push(newBasket)
+                                        col.updateOne({
+                                            _id: ctx.chat.id
+                                        }, {
+                                            $set: {
+                                                "basket": lastBasket
+                                            }
+                                        }, {
+                                            upsert: true,
+                                            multi: true
+                                        })
+                                        break
+                                    }
+                                    i++
+                                }
+                            }else{
+                                var lastBasket = user.basket
+                                var newBasket = {
+                                    "product_id": ctx.match,
+                                    "quantitie": 1
+                                }
+                                lastBasket.push(newBasket)
+                                col.updateOne({
+                                    _id: ctx.chat.id
+                                }, {
+                                    $set: {
+                                        "basket": lastBasket
+                                    }
+                                }, {
+                                    upsert: true,
+                                    multi: true
+                                })
+                            }
+                        } else {
+                            console.log('1');
+                            var userInfo = {
                                 "_id": ctx.chat.id,
                                 "basket": [{
-                                    
+                                    "product_id": ctx.match,
+                                    "quantitie": 1
                                 }]
                             }
+                            await col.insertOne(userInfo)
                         }
                     } catch (err) {
                         console.log(err);
                     }
                 }
-
-                await addToProdBD()
-                ctx.scene.enter('basketS')
+                await addProdToBasket()
             })
+
         })
+
+
+        userS.hears('корзина', (ctx) => {
+
+            ctx.scene.enter('basketS')
+        })
+
+
+
+
+
         return userS
     }
 }

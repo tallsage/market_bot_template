@@ -70,9 +70,6 @@ class SceneGenerator {
     UserScene() {
         const userS = new Scene('userS')
 
-
-
-
         userS.enter(async (ctx) => {
 
             bot.telegram.sendMessage(ctx.chat.id, 'привет привет привет привет привет привет привет приветприветпривет привет привет привет ', Keyboard(1, 'корзина'))
@@ -153,14 +150,14 @@ class SceneGenerator {
 
                             while (j != user.basket.length) {
                                 var flag = false
-                                
+
                                 if (user.basket[i].product_id === ctx.match) {
                                     flag = true
                                     break
                                 }
                                 j++
                             }
-                            
+
                             if (flag == true) {
                                 while (i != user.basket.length) {
                                     var lastBasket = user.basket
@@ -186,7 +183,7 @@ class SceneGenerator {
                                     }
                                     i++
                                 }
-                            }else{
+                            } else {
                                 var lastBasket = user.basket
                                 var newBasket = {
                                     "product_id": ctx.match,
@@ -205,7 +202,6 @@ class SceneGenerator {
                                 })
                             }
                         } else {
-                            console.log('1');
                             var userInfo = {
                                 "_id": ctx.chat.id,
                                 "basket": [{
@@ -221,18 +217,11 @@ class SceneGenerator {
                 }
                 await addProdToBasket()
             })
-
         })
-
 
         userS.hears('корзина', (ctx) => {
-
             ctx.scene.enter('basketS')
         })
-
-
-
-
 
         return userS
     }
